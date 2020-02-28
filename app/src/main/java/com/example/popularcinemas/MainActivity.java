@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mPosterGrid;
     private String path = PATH_POPULAR;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         mPosterGrid.setLayoutManager(layoutManager);
         mPosterGrid.setHasFixedSize(true);
 
-        mAdapter = new PosterAdapter();
+        mAdapter = new PosterAdapter(new ArrayList<Cinema>());
         mPosterGrid.setAdapter(mAdapter);
         makeQuery();
     }
@@ -49,19 +49,18 @@ public class MainActivity extends AppCompatActivity {
         new CinemaTask().execute(url);
     }
 
-
     public
-    class CinemaTask extends AsyncTask<URL, Void, List<Cinema>> {
+    class CinemaTask extends AsyncTask<URL, Void, ArrayList<Cinema>> {
 
         @Override
-        protected List<Cinema> doInBackground(URL... urls) {
+        protected ArrayList<Cinema> doInBackground(URL... urls) {
             URL searchUrl = urls[0];
             return NetworkUtils.extractCinema(searchUrl);
         }
 
         @Override
-        protected void onPostExecute(List<Cinema> cinemaList) {
-            mAdapter.setListItems(cinemaList);
+        protected void onPostExecute(ArrayList<Cinema> cinemaList) {
+            mAdapter.updateCinemaList(cinemaList);
             super.onPostExecute(cinemaList);
         }
     }
@@ -80,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.sort_ratings_item:
                 path = PATH_TOP_RATED;
+                break;
         }
         makeQuery();
         return super.onOptionsItemSelected(item);

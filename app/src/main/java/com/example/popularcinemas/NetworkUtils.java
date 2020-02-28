@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkUtils {
-    public static final String LOG_TAG = NetworkUtils.class.getSimpleName();
+    private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
 
-    public static List<Cinema> extractCinema(URL requestURL) {
+    public static ArrayList<Cinema> extractCinema(URL requestURL) {
         String jsonResponse = null;
         try {
             jsonResponse = makeHTTPRequest(requestURL);
@@ -31,7 +31,7 @@ public class NetworkUtils {
         return extractCinemaFromJSON(jsonResponse);
     }
 
-    private static List<Cinema> extractCinemaFromJSON(String cinemaJSON) {
+    private static ArrayList<Cinema> extractCinemaFromJSON(String cinemaJSON) {
         ArrayList<Cinema> cinemas = new ArrayList<>();
         if (TextUtils.isEmpty(cinemaJSON)) {
             return null;

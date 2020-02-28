@@ -1,6 +1,7 @@
 package com.example.popularcinemas;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,15 +9,24 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterViewHolder> {
-    private List<Cinema> cinemaList;
+    private static final String LOG_TAG = PosterAdapter.class.getSimpleName();
+    private ArrayList<Cinema> cinemaList;
 
-    public PosterAdapter() {}
+    public PosterAdapter(ArrayList<Cinema> arrayList) {
+        cinemaList = arrayList;
+    }
+
+    public void updateCinemaList(ArrayList<Cinema> updatedList) {
+        cinemaList.clear();
+        cinemaList.addAll(updatedList);
+    }
 
     @NonNull
     @Override
@@ -41,10 +51,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         return cinemaList.size();
     }
 
-    public void setListItems(List<Cinema> list) {
-        cinemaList = list;
-    }
-
     public class PosterViewHolder extends RecyclerView.ViewHolder {
         ImageView posterUnit;
 
@@ -57,6 +63,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         public void bind(int position) {
             Cinema cinema = cinemaList.get(position);
             String posterPath = cinema.getPoster();
+            Log.v(LOG_TAG, "Custom Log: Poster path is " + posterPath);
             Picasso.get()
                     .load(posterPath)
                     .into(posterUnit);
