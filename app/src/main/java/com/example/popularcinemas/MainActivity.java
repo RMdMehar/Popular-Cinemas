@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,12 +20,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements PosterAdapter.GridItemClickListener {
     private static final String baseUrl = "https://api.themoviedb.org/3/movie/";
     private static final String apiKey = "1b36e1b2f2bacb56b80a5bab3aa001a2";
-    private static final String PATH_POPULAR = "popular";
-    private static final String PATH_TOP_RATED = "top_rated";
 
     private PosterAdapter mAdapter;
     private RecyclerView mPosterGrid;
-    private String path = PATH_POPULAR;
+    private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +40,12 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
         mPosterGrid.setAdapter(mAdapter);
 
         makeQuery();
+    }
+
+    public void loadSortOrderFromPreferences(SharedPreferences sharedPreferences) {
+        String key_sort = getString(R.string.key_sort);
+        String default_value = getString(R.string.value_sort_by_popularity);
+        path = sharedPreferences.getString(key_sort, default_value);
     }
 
     public void makeQuery() {
