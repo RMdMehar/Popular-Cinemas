@@ -7,7 +7,7 @@ public class Cinema {
     private double mVoteAvg;
     private String mPlot;
 
-    private final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w185/";
+    private final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500/";
 
     public Cinema(String title, String releaseDate, String poster, double voteAvg, String plot) {
         mTitle = title;

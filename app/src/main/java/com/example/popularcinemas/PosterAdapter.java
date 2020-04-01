@@ -18,14 +18,24 @@ import androidx.recyclerview.widget.RecyclerView;
 public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterViewHolder> {
     private static final String LOG_TAG = PosterAdapter.class.getSimpleName();
     private ArrayList<Cinema> cinemaList;
+    final private GridItemClickListener mOnClickListener;
 
-    public PosterAdapter(ArrayList<Cinema> arrayList) {
+    public PosterAdapter(ArrayList<Cinema> arrayList, GridItemClickListener listener) {
         cinemaList = arrayList;
+        mOnClickListener = listener;
     }
 
     public void updateCinemaList(ArrayList<Cinema> updatedList) {
         cinemaList.clear();
         cinemaList.addAll(updatedList);
+    }
+
+    public ArrayList<Cinema> getCinemaList() {
+        return cinemaList;
+    }
+
+    public interface GridItemClickListener {
+        void onGridItemClick(int clickedItemIndex);
     }
 
     @NonNull
@@ -51,13 +61,14 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         return cinemaList.size();
     }
 
-    public class PosterViewHolder extends RecyclerView.ViewHolder {
+    public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView posterUnit;
 
         public PosterViewHolder(View itemView) {
             super(itemView);
 
             posterUnit = itemView.findViewById(R.id.poster_unit);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(int position) {
@@ -67,6 +78,12 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
             Picasso.get()
                     .load(posterPath)
                     .into(posterUnit);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int clickedPosition = getAdapterPosition();
+            mOnClickListener.onGridItemClick(clickedPosition);
         }
     }
 }

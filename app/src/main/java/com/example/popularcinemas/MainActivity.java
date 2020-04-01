@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.IntentService;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,7 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PosterAdapter.GridItemClickListener {
     private static final String baseUrl = "https://api.themoviedb.org/3/movie/";
     private static final String apiKey = "1b36e1b2f2bacb56b80a5bab3aa001a2";
     private static final String PATH_POPULAR = "popular";
@@ -35,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
         mPosterGrid.setLayoutManager(layoutManager);
         mPosterGrid.setHasFixedSize(true);
 
-        mAdapter = new PosterAdapter(new ArrayList<Cinema>());
+        mAdapter = new PosterAdapter(new ArrayList<Cinema>(), this);
         mPosterGrid.setAdapter(mAdapter);
+
         makeQuery();
     }
 
@@ -49,9 +52,25 @@ public class MainActivity extends AppCompatActivity {
         new CinemaTask().execute(url);
     }
 
+    @Override
+    public void onGridItemClick(int clickedItemIndex) {
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        Cinema cinema = mAdapter.getCinemaList().get(clickedItemIndex);
+        String title = cinema.getTitle();
+        String plot = cinema.getPlot();
+        String date = cinema.getReleaseDate();
+        String voteAvg = String.valueOf(cinema.getVoteAvg());
+        String poster = cinema.getPoster();
+        intent.putExtra("title", title);
+        intent.putExtra("plot", plot);
+        intent.putExtra("date", date);
+        intent.putExtra("voteAvg", voteAvg);
+        intent.putExtra("poster", poster);
+        startActivity(intent);
+    }
+
     public
     class CinemaTask extends AsyncTask<URL, Void, ArrayList<Cinema>> {
-
         @Override
         protected ArrayList<Cinema> doInBackground(URL... urls) {
             URL searchUrl = urls[0];
@@ -61,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Cinema> cinemaList) {
             mAdapter.updateCinemaList(cinemaList);
+            mPosterGrid.setAdapter(mAdapter);
             super.onPostExecute(cinemaList);
         }
     }
@@ -73,14 +93,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sort_popular_item:
-                path = PATH_POPULAR;
-                break;
-            case R.id.sort_ratings_item:
-                path = PATH_TOP_RATED;
-                break;
+        int id = item.getItemId();
+        if (id == R.id.sort_menu_item) {
+            Intent intent = new Intent(MainActivity.this, SortActivity.class);
+            startActivity(intent);
         }
+
         makeQuery();
         return super.onOptionsItemSelected(item);
     }
