@@ -1,7 +1,9 @@
-package com.example.popularcinemas;
+package com.example.popularcinemas.utilities;
 
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.example.popularcinemas.database.Cinema;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,7 +18,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
 
 public class NetworkUtils {
     private static final String LOG_TAG = NetworkUtils.class.getSimpleName();

@@ -1,4 +1,4 @@
-package com.example.popularcinemas;
+package com.example.popularcinemas.utilities;
 
 import android.content.Context;
 import android.util.Log;
@@ -7,10 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.popularcinemas.R;
+import com.example.popularcinemas.database.Cinema;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;

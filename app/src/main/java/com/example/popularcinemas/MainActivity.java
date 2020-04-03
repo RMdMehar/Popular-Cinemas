@@ -1,34 +1,40 @@
 package com.example.popularcinemas;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.popularcinemas.database.Cinema;
+import com.example.popularcinemas.utilities.NetworkUtils;
+import com.example.popularcinemas.utilities.PosterAdapter;
+
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PosterAdapter.GridItemClickListener {
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+public class MainActivity extends AppCompatActivity implements PosterAdapter.GridItemClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String baseUrl = "https://api.themoviedb.org/3/movie/";
     private static final String apiKey = "1b36e1b2f2bacb56b80a5bab3aa001a2";
 
     private PosterAdapter mAdapter;
     private RecyclerView mPosterGrid;
-    private String path;
+    private String path = "popular";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         mPosterGrid = findViewById(R.id.posters_recycler_view);
 
@@ -39,7 +45,15 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
         mAdapter = new PosterAdapter(new ArrayList<Cinema>(), this);
         mPosterGrid.setAdapter(mAdapter);
 
+        loadSortOrderFromPreferences(sharedPreferences);
         makeQuery();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 
     public void loadSortOrderFromPreferences(SharedPreferences sharedPreferences) {
@@ -72,6 +86,14 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
         intent.putExtra("voteAvg", voteAvg);
         intent.putExtra("poster", poster);
         startActivity(intent);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.key_sort))) {
+            path = sharedPreferences.getString(key, getString(R.string.value_sort_by_popularity));
+            makeQuery();
+        }
     }
 
     public
