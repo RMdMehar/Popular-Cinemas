@@ -3,7 +3,8 @@ package com.example.popularcinemas.utilities;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.popularcinemas.database.Cinema;
+import com.example.popularcinemas.model.Cinema;
+import com.example.popularcinemas.model.Video;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 
 public class NetworkUtils {
     private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
+    public static final String baseUrl = "https://api.themoviedb.org/3/movie/";
+    public static final String apiKey = "1b36e1b2f2bacb56b80a5bab3aa001a2";
 
     public static ArrayList<Cinema> extractCinema(URL requestURL) {
         String jsonResponse = null;
@@ -32,6 +35,16 @@ public class NetworkUtils {
         return extractCinemaFromJSON(jsonResponse);
     }
 
+    public static ArrayList<Video> extractVideo(URL requestURL) {
+        String jsonResponse = null;
+        try {
+            jsonResponse = makeHTTPRequest(requestURL);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Custom Log: Error making HTTP request", e);
+        }
+        return extractVideoFromJSON(jsonResponse);
+    }
+
     private static ArrayList<Cinema> extractCinemaFromJSON(String cinemaJSON) {
         ArrayList<Cinema> cinemas = new ArrayList<>();
         if (TextUtils.isEmpty(cinemaJSON)) {
@@ -41,21 +54,45 @@ public class NetworkUtils {
         try {
             int i;
             JSONObject root = new JSONObject(cinemaJSON);
-            JSONArray array = root.getJSONArray("results");
-            for (i=0; i<array.length(); i++) {
-                JSONObject arrayItem = array.getJSONObject(i);
+            JSONArray cinemaArray = root.getJSONArray("results");
+            for (i=0; i<cinemaArray.length(); i++) {
+                JSONObject arrayItem = cinemaArray.getJSONObject(i);
                 String poster = arrayItem.getString("poster_path");
+                int cinemaId = arrayItem.getInt("id");
                 String title = arrayItem.getString("title");
                 double voteAvg = arrayItem.getDouble("vote_average");
                 String plot = arrayItem.getString("overview");
                 String releaseDate = arrayItem.getString("release_date");
 
-                cinemas.add(new Cinema(title, releaseDate, poster, voteAvg, plot));
+                cinemas.add(new Cinema(cinemaId, title, releaseDate, poster, voteAvg, plot));
             }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Custom Log: Problem parsing JSON results", e);
         }
         return cinemas;
+    }
+
+    private static ArrayList<Video> extractVideoFromJSON(String videoJSON) {
+        ArrayList<Video> videos= new ArrayList<>();
+        if (TextUtils.isEmpty(videoJSON)) {
+            return null;
+        }
+
+        try {
+            int i;
+            JSONObject root = new JSONObject(videoJSON);
+            JSONArray videoArray = root.getJSONArray("results");
+            for (i=0; i<videoArray.length(); i++) {
+                JSONObject arrayItem = videoArray.getJSONObject(i);
+                String name = arrayItem.getString("name");
+                String videoKey = arrayItem.getString("key");
+
+                videos.add(new Video(name, videoKey));
+            }
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Custom Log: Problem parsing JSON results", e);
+        }
+        return videos;
     }
 
     public static URL buildUrl(String stringURL) {

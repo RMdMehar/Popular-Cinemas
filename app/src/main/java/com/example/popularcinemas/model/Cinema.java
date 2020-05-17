@@ -1,4 +1,4 @@
-package com.example.popularcinemas.database;
+package com.example.popularcinemas.model;
 
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey;
 public class Cinema {
     @PrimaryKey(autoGenerate = true)
     private int id;
+    private int mCinemaId;
     private String mTitle;
     private String mReleaseDate;
     private String mPoster;
@@ -15,7 +16,8 @@ public class Cinema {
     private String mPlot;
 
     @Ignore
-    public Cinema(String title, String releaseDate, String poster, double voteAvg, String plot) {
+    public Cinema(int cinemaId, String title, String releaseDate, String poster, double voteAvg, String plot) {
+        mCinemaId = cinemaId;
         mTitle = title;
         mReleaseDate = releaseDate;
         mPoster = poster;
@@ -23,7 +25,9 @@ public class Cinema {
         mPlot = plot;
     }
 
-    public Cinema(int id, String title, String releaseDate, String poster, double voteAvg, String plot) {
+    public Cinema(int id, int cinemaId, String title, String releaseDate, String poster, double voteAvg, String plot) {
+        this.id = id;
+        mCinemaId = cinemaId;
         mTitle = title;
         mReleaseDate = releaseDate;
         mPoster = poster;
@@ -33,6 +37,10 @@ public class Cinema {
 
     public int getId() {
         return id;
+    }
+
+    public int getCinemaId() {
+        return mCinemaId;
     }
 
     public String getTitle() {

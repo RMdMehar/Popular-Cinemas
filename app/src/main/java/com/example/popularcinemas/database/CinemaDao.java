@@ -1,5 +1,7 @@
 package com.example.popularcinemas.database;
 
+import com.example.popularcinemas.model.Cinema;
+
 import java.util.ArrayList;
 
 import androidx.room.Dao;

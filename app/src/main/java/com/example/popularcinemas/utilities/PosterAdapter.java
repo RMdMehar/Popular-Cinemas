@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.popularcinemas.R;
-import com.example.popularcinemas.database.Cinema;
+import com.example.popularcinemas.model.Cinema;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

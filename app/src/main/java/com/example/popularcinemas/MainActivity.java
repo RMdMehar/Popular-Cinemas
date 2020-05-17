@@ -9,7 +9,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.popularcinemas.database.Cinema;
+import com.example.popularcinemas.model.Cinema;
 import com.example.popularcinemas.utilities.NetworkUtils;
 import com.example.popularcinemas.utilities.PosterAdapter;
 
@@ -22,12 +22,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity implements PosterAdapter.GridItemClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener{
-    private static final String baseUrl = "https://api.themoviedb.org/3/movie/";
-    private static final String apiKey = "1b36e1b2f2bacb56b80a5bab3aa001a2";
 
     private PosterAdapter mAdapter;
     private RecyclerView mPosterGrid;
-    private String path = "popular";
+    private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +61,9 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
     }
 
     public void makeQuery() {
-        Uri builtUri = Uri.parse(baseUrl).buildUpon()
+        Uri builtUri = Uri.parse(NetworkUtils.baseUrl).buildUpon()
                 .appendPath(path)
-                .appendQueryParameter("api_key", apiKey)
+                .appendQueryParameter("api_key", NetworkUtils.apiKey)
                 .build();
         URL url = NetworkUtils.buildUrl(builtUri.toString());
         new CinemaTask().execute(url);
@@ -75,11 +73,13 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
     public void onGridItemClick(int clickedItemIndex) {
         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
         Cinema cinema = mAdapter.getCinemaList().get(clickedItemIndex);
+        int cinemaId = cinema.getCinemaId();
         String title = cinema.getTitle();
         String plot = cinema.getPlot();
         String date = cinema.getReleaseDate();
         String voteAvg = String.valueOf(cinema.getVoteAvg());
         String poster = cinema.getPoster();
+        intent.putExtra("cinemaId", cinemaId);
         intent.putExtra("title", title);
         intent.putExtra("plot", plot);
         intent.putExtra("date", date);
@@ -96,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
         }
     }
 
-    public
-    class CinemaTask extends AsyncTask<URL, Void, ArrayList<Cinema>> {
+    public class CinemaTask extends AsyncTask<URL, Void, ArrayList<Cinema>> {
         @Override
         protected ArrayList<Cinema> doInBackground(URL... urls) {
             URL searchUrl = urls[0];
