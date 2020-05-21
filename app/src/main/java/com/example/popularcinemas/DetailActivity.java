@@ -13,7 +13,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.popularcinemas.database.AppDatabase;
+import com.example.popularcinemas.model.Cinema;
 import com.example.popularcinemas.model.Video;
+import com.example.popularcinemas.utilities.AppExecutors;
 import com.example.popularcinemas.utilities.NetworkUtils;
 import com.example.popularcinemas.utilities.VideoAdapter;
 import com.squareup.picasso.Picasso;
@@ -25,9 +28,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class DetailActivity extends AppCompatActivity {
-    ListView videoListView;
-    private VideoAdapter videoAdapter;
-    ArrayList<Video> videoArrayList = new ArrayList<>();
+    private boolean isFavourite;
+
+    private AppDatabase mDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,18 +38,20 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         setTitle("Cinema Details");
 
+        mDB = AppDatabase.getInstance(getApplicationContext());
+
         Intent intent = getIntent();
-        int cinemaId = intent.getIntExtra("cinemaId", -1);
-        String title = intent.getStringExtra("title");
-        String plot = intent.getStringExtra("plot");
-        String date = intent.getStringExtra("date");
-        String poster = intent.getStringExtra("poster");
-        String voteAvg = intent.getStringExtra("voteAvg");
+        final int cinemaId = intent.getIntExtra("cinemaId", -1);
+        final String title = intent.getStringExtra("title");
+        final String plot = intent.getStringExtra("plot");
+        final String date = intent.getStringExtra("date");
+        final String poster = intent.getStringExtra("poster");
+        final String voteAvg = intent.getStringExtra("voteAvg");
 
         TextView title_textview = findViewById(R.id.title_textview);
         title_textview.setText(title);
 
-        /*TextView plot_textview = findViewById(R.id.plot_textview);
+        TextView plot_textview = findViewById(R.id.plot_textview);
         plot_textview.setText(plot);
 
         TextView voteAvg_textview = findViewById(R.id.vote_avg_textview);
@@ -67,44 +72,67 @@ public class DetailActivity extends AppCompatActivity {
         ImageView poster_imageview = findViewById(R.id.poster_imageview);
         Picasso.get()
                 .load(poster)
-                .into(poster_imageview);*/
+                .into(poster_imageview);
 
-        videoListView = findViewById(R.id.video_list);
-        videoAdapter = new VideoAdapter(this, videoArrayList);
-        videoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        TextView videoTextView = findViewById(R.id.video_textview);
+        videoTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Video currentVideo = videoAdapter.getItem(position);
-                String videoKey = currentVideo.getVideoKey();
-                Intent videoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + videoKey));
-                startActivity(videoIntent);
+            public void onClick(View v) {
+                Intent intent = new Intent(DetailActivity.this, VideoActivity.class);
+                intent.putExtra("cinemaId", cinemaId);
+                startActivity(intent);
             }
         });
-        queryForVideos(cinemaId);
-    }
 
-    public void queryForVideos(int cinemaId) {
-        Uri builtUri = Uri.parse(NetworkUtils.baseUrl).buildUpon()
-                .appendPath(String.valueOf(cinemaId))
-                .appendPath("videos")
-                .appendQueryParameter("api_key", NetworkUtils.apiKey)
-                .build();
-        URL url = NetworkUtils.buildUrl(builtUri.toString());
-        new VideoTask().execute(url);
-    }
+        TextView reviewsTextView = findViewById(R.id.reviews_textview);
+        reviewsTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DetailActivity.this, ReviewsActivity.class);
+                intent.putExtra("cinemaId", cinemaId);
+                startActivity(intent);
+            }
+        });
 
-    public class VideoTask extends AsyncTask<URL, Void, ArrayList<Video>> {
+        final ImageView favButton = findViewById(R.id.fav_button);
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                Cinema check = mDB.cinemaDao().loadCinemaById(cinemaId);
+                if (check != null) {
+                    isFavourite = true;
+                    favButton.setImageResource(R.drawable.ic_star_white_48dp);
+                } else {
+                    isFavourite = false;
+                    favButton.setImageResource(R.drawable.ic_star_border_white_48dp);
+                }
+            }
+        });
 
-        @Override
-        protected ArrayList<Video> doInBackground(URL... urls) {
-            URL searchUrl = urls[0];
-            return NetworkUtils.extractVideo(searchUrl);
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Video> videoList) {
-            videoAdapter.addAll(videoList);
-            videoListView.setAdapter(videoAdapter);
-        }
+        favButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Cinema favouriteCinema = new Cinema(cinemaId, title, date, poster, Double.parseDouble(voteAvg), plot);
+                if(isFavourite) {
+                    isFavourite = false;
+                    favButton.setImageResource(R.drawable.ic_star_border_white_48dp);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDB.cinemaDao().deleteFavouriteCinema(favouriteCinema);
+                        }
+                    });
+                } else {
+                    isFavourite = true;
+                    favButton.setImageResource(R.drawable.ic_star_white_48dp);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDB.cinemaDao().insertFavouriteCinema(favouriteCinema);
+                        }
+                    });
+                }
+            }
+        });
     }
 }

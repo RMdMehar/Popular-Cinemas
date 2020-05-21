@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.popularcinemas.model.Cinema;
+import com.example.popularcinemas.model.Review;
 import com.example.popularcinemas.model.Video;
 
 import org.json.JSONArray;
@@ -19,13 +20,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 public class NetworkUtils {
     private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
     public static final String baseUrl = "https://api.themoviedb.org/3/movie/";
     public static final String apiKey = "1b36e1b2f2bacb56b80a5bab3aa001a2";
 
-    public static ArrayList<Cinema> extractCinema(URL requestURL) {
+    public static List<Cinema> extractCinema(URL requestURL) {
         String jsonResponse = null;
         try {
             jsonResponse = makeHTTPRequest(requestURL);
@@ -35,7 +37,7 @@ public class NetworkUtils {
         return extractCinemaFromJSON(jsonResponse);
     }
 
-    public static ArrayList<Video> extractVideo(URL requestURL) {
+    public static List<Video> extractVideo(URL requestURL) {
         String jsonResponse = null;
         try {
             jsonResponse = makeHTTPRequest(requestURL);
@@ -45,8 +47,18 @@ public class NetworkUtils {
         return extractVideoFromJSON(jsonResponse);
     }
 
-    private static ArrayList<Cinema> extractCinemaFromJSON(String cinemaJSON) {
-        ArrayList<Cinema> cinemas = new ArrayList<>();
+    public static List<Review> extractReview(URL requestURL) {
+        String jsonResponse = null;
+        try {
+            jsonResponse = makeHTTPRequest(requestURL);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Custom Log: Error making HTTP request", e);
+        }
+        return extractReviewFromJSON(jsonResponse);
+    }
+
+    private static List<Cinema> extractCinemaFromJSON(String cinemaJSON) {
+        List<Cinema> cinemas = new ArrayList<>();
         if (TextUtils.isEmpty(cinemaJSON)) {
             return null;
         }
@@ -72,8 +84,8 @@ public class NetworkUtils {
         return cinemas;
     }
 
-    private static ArrayList<Video> extractVideoFromJSON(String videoJSON) {
-        ArrayList<Video> videos= new ArrayList<>();
+    private static List<Video> extractVideoFromJSON(String videoJSON) {
+        List<Video> videos= new ArrayList<>();
         if (TextUtils.isEmpty(videoJSON)) {
             return null;
         }
@@ -93,6 +105,29 @@ public class NetworkUtils {
             Log.e(LOG_TAG, "Custom Log: Problem parsing JSON results", e);
         }
         return videos;
+    }
+
+    private static List<Review> extractReviewFromJSON(String reviewJSON) {
+        List<Review> reviews = new ArrayList<>();
+        if (TextUtils.isEmpty(reviewJSON)) {
+            return null;
+        }
+
+        try {
+            int i;
+            JSONObject root = new JSONObject(reviewJSON);
+            JSONArray reviewArray = root.getJSONArray("results");
+            for (i=0; i<reviewArray.length(); i++) {
+                JSONObject arrayItem = reviewArray.getJSONObject(i);
+                String author = arrayItem.getString("author");
+                String content = arrayItem.getString("content");
+
+                reviews.add(new Review(author, content));
+            }
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Custom Log: Problem parsing JSON results", e);
+        }
+        return reviews;
     }
 
     public static URL buildUrl(String stringURL) {

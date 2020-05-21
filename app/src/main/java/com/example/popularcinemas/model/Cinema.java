@@ -6,8 +6,7 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "favourite_cinemas")
 public class Cinema {
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey
     private int mCinemaId;
     private String mTitle;
     private String mReleaseDate;
@@ -15,7 +14,7 @@ public class Cinema {
     private double mVoteAvg;
     private String mPlot;
 
-    @Ignore
+
     public Cinema(int cinemaId, String title, String releaseDate, String poster, double voteAvg, String plot) {
         mCinemaId = cinemaId;
         mTitle = title;
@@ -25,18 +24,8 @@ public class Cinema {
         mPlot = plot;
     }
 
-    public Cinema(int id, int cinemaId, String title, String releaseDate, String poster, double voteAvg, String plot) {
-        this.id = id;
-        mCinemaId = cinemaId;
-        mTitle = title;
-        mReleaseDate = releaseDate;
-        mPoster = poster;
-        mVoteAvg = voteAvg;
-        mPlot = plot;
-    }
-
     public int getId() {
-        return id;
+        return mCinemaId;
     }
 
     public int getCinemaId() {

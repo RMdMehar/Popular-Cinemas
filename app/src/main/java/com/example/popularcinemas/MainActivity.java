@@ -6,26 +6,35 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.popularcinemas.database.AppDatabase;
 import com.example.popularcinemas.model.Cinema;
 import com.example.popularcinemas.utilities.NetworkUtils;
 import com.example.popularcinemas.utilities.PosterAdapter;
+import com.example.popularcinemas.viewmodel.MainViewModel;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity implements PosterAdapter.GridItemClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener{
 
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private PosterAdapter mAdapter;
     private RecyclerView mPosterGrid;
     private String path;
+
+    private AppDatabase mDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
         setContentView(R.layout.activity_main);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+        mDB = AppDatabase.getInstance(getApplicationContext());
 
         mPosterGrid = findViewById(R.id.posters_recycler_view);
 
@@ -44,7 +55,11 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
         mPosterGrid.setAdapter(mAdapter);
 
         loadSortOrderFromPreferences(sharedPreferences);
-        makeQuery();
+        if (!path.equals(getString(R.string.value_sort_by_favourites))) {
+            makeQuery();
+        } else {
+            setupViewModel();
+        }
     }
 
     @Override
@@ -92,23 +107,41 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.key_sort))) {
             path = sharedPreferences.getString(key, getString(R.string.value_sort_by_popularity));
-            makeQuery();
+            if (!path.equals(getString(R.string.value_sort_by_favourites))) {
+                makeQuery();
+            } else {
+                setupViewModel();
+            }
         }
     }
 
-    public class CinemaTask extends AsyncTask<URL, Void, ArrayList<Cinema>> {
+    public class CinemaTask extends AsyncTask<URL, Void, List<Cinema>> {
         @Override
-        protected ArrayList<Cinema> doInBackground(URL... urls) {
+        protected List<Cinema> doInBackground(URL... urls) {
             URL searchUrl = urls[0];
             return NetworkUtils.extractCinema(searchUrl);
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Cinema> cinemaList) {
+        protected void onPostExecute(List<Cinema> cinemaList) {
             mAdapter.updateCinemaList(cinemaList);
             mPosterGrid.setAdapter(mAdapter);
             super.onPostExecute(cinemaList);
         }
+    }
+
+    private void setupViewModel() {
+        MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel.getFavouriteCinemas().observe(this, new Observer<List<Cinema>>() {
+            @Override
+            public void onChanged(List<Cinema> cinemaList) {
+                Log.d(LOG_TAG, "Custom Log: Updating list of favourite cinemas in ViewModel");
+                Log.v(LOG_TAG, "Custom Log: no of cinemas = " + cinemaList.size());
+
+                mAdapter.updateCinemaList(cinemaList);
+                mPosterGrid.setAdapter(mAdapter);
+            }
+        });
     }
 
     @Override

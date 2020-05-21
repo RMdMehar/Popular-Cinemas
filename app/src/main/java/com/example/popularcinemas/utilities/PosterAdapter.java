@@ -12,26 +12,27 @@ import com.example.popularcinemas.model.Cinema;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterViewHolder> {
-    private static final String LOG_TAG = PosterAdapter.class.getSimpleName();
-    private ArrayList<Cinema> cinemaList;
+    private List<Cinema> cinemaList;
     final private GridItemClickListener mOnClickListener;
 
-    public PosterAdapter(ArrayList<Cinema> arrayList, GridItemClickListener listener) {
+    public PosterAdapter(List<Cinema> arrayList, GridItemClickListener listener) {
         cinemaList = arrayList;
         mOnClickListener = listener;
     }
 
-    public void updateCinemaList(ArrayList<Cinema> updatedList) {
+    public void updateCinemaList(List<Cinema> updatedList) {
         cinemaList.clear();
         cinemaList.addAll(updatedList);
+        notifyDataSetChanged();
     }
 
-    public ArrayList<Cinema> getCinemaList() {
+    public List<Cinema> getCinemaList() {
         return cinemaList;
     }
 
@@ -75,7 +76,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         public void bind(int position) {
             Cinema cinema = cinemaList.get(position);
             String posterPath = cinema.getPoster();
-            Log.v(LOG_TAG, "Custom Log: Poster path is " + posterPath);
             Picasso.get()
                     .load(posterPath)
                     .into(posterUnit);
