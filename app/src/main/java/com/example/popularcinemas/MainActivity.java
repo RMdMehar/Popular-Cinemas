@@ -34,16 +34,12 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
     private RecyclerView mPosterGrid;
     private String path;
 
-    private AppDatabase mDB;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-
-        mDB = AppDatabase.getInstance(getApplicationContext());
 
         mPosterGrid = findViewById(R.id.posters_recycler_view);
 
@@ -158,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
             startActivity(intent);
         }
 
-        makeQuery();
         return super.onOptionsItemSelected(item);
     }
 }
