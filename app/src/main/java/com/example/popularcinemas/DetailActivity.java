@@ -1,31 +1,22 @@
 package com.example.popularcinemas;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.popularcinemas.database.AppDatabase;
 import com.example.popularcinemas.model.Cinema;
-import com.example.popularcinemas.model.Video;
 import com.example.popularcinemas.utilities.AppExecutors;
-import com.example.popularcinemas.utilities.NetworkUtils;
-import com.example.popularcinemas.utilities.VideoAdapter;
 import com.squareup.picasso.Picasso;
 
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class DetailActivity extends AppCompatActivity {
     private boolean isFavourite;

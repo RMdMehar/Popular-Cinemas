@@ -100,7 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
-                android:text="Videos"
+                android:text="@string/videos"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"/>
 
@@ -115,7 +115,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
-                android:text="Reviews"
+                android:text="@string/reviews"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"/>
 

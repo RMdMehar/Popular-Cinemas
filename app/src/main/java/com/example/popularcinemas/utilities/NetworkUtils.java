@@ -25,7 +25,7 @@ import java.util.List;
 public class NetworkUtils {
     private static final String LOG_TAG = NetworkUtils.class.getSimpleName();
     public static final String baseUrl = "https://api.themoviedb.org/3/movie/";
-    public static final String apiKey = "1b36e1b2f2bacb56b80a5bab3aa001a2";
+    public static final String apiKey = "";//enter api_key here
 
     public static List<Cinema> extractCinema(URL requestURL) {
         String jsonResponse = null;
@@ -69,7 +69,8 @@ public class NetworkUtils {
             JSONArray cinemaArray = root.getJSONArray("results");
             for (i=0; i<cinemaArray.length(); i++) {
                 JSONObject arrayItem = cinemaArray.getJSONObject(i);
-                String poster = arrayItem.getString("poster_path");
+                String poster_path = arrayItem.getString("poster_path");
+                String poster = "https://image.tmdb.org/t/p/w500/" + poster_path;
                 int cinemaId = arrayItem.getInt("id");
                 String title = arrayItem.getString("title");
                 double voteAvg = arrayItem.getDouble("vote_average");

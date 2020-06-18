@@ -6,11 +6,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
-import com.example.popularcinemas.database.AppDatabase;
 import com.example.popularcinemas.model.Cinema;
 import com.example.popularcinemas.utilities.NetworkUtils;
 import com.example.popularcinemas.utilities.PosterAdapter;
@@ -29,10 +29,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MainActivity extends AppCompatActivity implements PosterAdapter.GridItemClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener{
 
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private PosterAdapter mAdapter;
     private RecyclerView mPosterGrid;
     private String path;
+
+    TextView emptyMainView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
         setContentView(R.layout.activity_main);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+        emptyMainView = findViewById(R.id.empty_main_view);
 
         mPosterGrid = findViewById(R.id.posters_recycler_view);
 
@@ -120,8 +123,15 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
 
         @Override
         protected void onPostExecute(List<Cinema> cinemaList) {
-            mAdapter.updateCinemaList(cinemaList);
-            mPosterGrid.setAdapter(mAdapter);
+            if (cinemaList.isEmpty()) {
+                mPosterGrid.setVisibility(View.GONE);
+                emptyMainView.setVisibility(View.VISIBLE);
+            } else {
+                mPosterGrid.setVisibility(View.VISIBLE);
+                emptyMainView.setVisibility(View.GONE);
+                mAdapter.updateCinemaList(cinemaList);
+                mPosterGrid.setAdapter(mAdapter);
+            }
             super.onPostExecute(cinemaList);
         }
     }
@@ -131,11 +141,17 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
         viewModel.getFavouriteCinemas().observe(this, new Observer<List<Cinema>>() {
             @Override
             public void onChanged(List<Cinema> cinemaList) {
-                Log.d(LOG_TAG, "Custom Log: Updating list of favourite cinemas in ViewModel");
-                Log.v(LOG_TAG, "Custom Log: no of cinemas = " + cinemaList.size());
-
-                mAdapter.updateCinemaList(cinemaList);
-                mPosterGrid.setAdapter(mAdapter);
+                if (path.equals(getString(R.string.value_sort_by_favourites))) {
+                    if (cinemaList.isEmpty()) {
+                        mPosterGrid.setVisibility(View.GONE);
+                        emptyMainView.setVisibility(View.VISIBLE);
+                    } else {
+                        mPosterGrid.setVisibility(View.VISIBLE);
+                        emptyMainView.setVisibility(View.GONE);
+                        mAdapter.updateCinemaList(cinemaList);
+                        mPosterGrid.setAdapter(mAdapter);
+                    }
+                }
             }
         });
     }
@@ -153,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Gri
             Intent intent = new Intent(MainActivity.this, SortActivity.class);
             startActivity(intent);
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

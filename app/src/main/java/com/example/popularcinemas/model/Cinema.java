@@ -1,7 +1,6 @@
 package com.example.popularcinemas.model;
 
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "favourite_cinemas")
@@ -13,7 +12,6 @@ public class Cinema {
     private String mPoster;
     private double mVoteAvg;
     private String mPlot;
-
 
     public Cinema(int cinemaId, String title, String releaseDate, String poster, double voteAvg, String plot) {
         mCinemaId = cinemaId;
@@ -41,8 +39,7 @@ public class Cinema {
     }
 
     public String getPoster() {
-        String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500/";
-        return IMAGE_BASE_URL + mPoster;
+        return mPoster;
     }
 
     public double getVoteAvg() {

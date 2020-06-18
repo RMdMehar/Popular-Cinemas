@@ -2,7 +2,6 @@ package com.example.popularcinemas.database;
 
 import com.example.popularcinemas.model.Cinema;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;

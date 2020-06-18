@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".VideoActivity">
-
-<ListView
-    android:id="@+id/reviews_list"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" />
+    android:layout_height="match_parent"
+    tools:context=".VideoActivity">
+
+    <ListView
+        android:id="@+id/reviews_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <TextView
+        android:id="@+id/empty_reviews_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/empty_reviews_message"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:visibility="gone"/>
 
 </RelativeLayout>

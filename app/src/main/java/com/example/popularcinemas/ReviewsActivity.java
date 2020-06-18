@@ -1,27 +1,26 @@
 package com.example.popularcinemas;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.popularcinemas.model.Review;
-import com.example.popularcinemas.model.Video;
 import com.example.popularcinemas.utilities.NetworkUtils;
 import com.example.popularcinemas.utilities.ReviewAdapter;
-import com.example.popularcinemas.utilities.VideoAdapter;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class ReviewsActivity extends AppCompatActivity {
     ListView reviewListView;
+    TextView emptyReviewsView;
     private ReviewAdapter reviewAdapter;
     ArrayList<Review> reviewArrayList = new ArrayList<>();
 
@@ -29,6 +28,8 @@ public class ReviewsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reviews);
+
+        emptyReviewsView = findViewById(R.id.empty_reviews_view);
 
         Intent intent = getIntent();
         int cinemaId = intent.getIntExtra("cinemaId", -1);
@@ -59,8 +60,15 @@ public class ReviewsActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Review> reviewList) {
-            reviewAdapter.addAll(reviewList);
-            reviewListView.setAdapter(reviewAdapter);
+            if (reviewList.isEmpty()) {
+                emptyReviewsView.setVisibility(View.VISIBLE);
+                reviewListView.setVisibility(View.GONE);
+            } else {
+                emptyReviewsView.setVisibility(View.GONE);
+                reviewListView.setVisibility(View.VISIBLE);
+                reviewAdapter.addAll(reviewList);
+                reviewListView.setAdapter(reviewAdapter);
+            }
         }
     }
 }

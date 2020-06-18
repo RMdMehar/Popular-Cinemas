@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.popularcinemas.model.Video;
 import com.example.popularcinemas.utilities.NetworkUtils;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class VideoActivity extends AppCompatActivity {
     ListView videoListView;
+    TextView emptyVideosView;
     private VideoAdapter videoAdapter;
     ArrayList<Video> videoArrayList = new ArrayList<>();
 
@@ -27,6 +29,8 @@ public class VideoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
+
+        emptyVideosView = findViewById(R.id.empty_videos_view);
 
         Intent intent = getIntent();
         int cinemaId = intent.getIntExtra("cinemaId", -1);
@@ -65,8 +69,15 @@ public class VideoActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Video> videoList) {
-            videoAdapter.addAll(videoList);
-            videoListView.setAdapter(videoAdapter);
+            if (videoList.isEmpty()) {
+                videoListView.setVisibility(View.GONE);
+                emptyVideosView.setVisibility(View.VISIBLE);
+            } else {
+                videoListView.setVisibility(View.VISIBLE);
+                emptyVideosView.setVisibility(View.GONE);
+                videoAdapter.addAll(videoList);
+                videoListView.setAdapter(videoAdapter);
+            }
         }
     }
 }

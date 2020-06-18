@@ -1,7 +1,6 @@
 package com.example.popularcinemas.utilities;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import com.example.popularcinemas.R;
 import com.example.popularcinemas.model.Cinema;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -29,7 +27,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     public void updateCinemaList(List<Cinema> updatedList) {
         cinemaList.clear();
         cinemaList.addAll(updatedList);
-        notifyDataSetChanged();
     }
 
     public List<Cinema> getCinemaList() {
